@@ -1,0 +1,20 @@
+[package]
+name = "into-static"
+version = "0.1.0"
+authors = ["nekitdev <nekit@nekit.dev>"]
+edition = "2024"
+description = "Upgrading to static lifetimes."
+documentation = "https://docs.rs/into-static"
+readme = "README.md"
+repository = "https://github.com/nekitdev/into-static"
+license = "MIT"
+keywords = ["static", "lifetime"]
+categories = ["rust-patterns"]
+
+[features]
+default = ["std"]
+std = []
+alloc = []
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docsrs"]
