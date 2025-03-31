@@ -5,6 +5,9 @@
 //! [`IntoStatic`] is implemented for [`Option<T>`] and [`Result<T, E>`], provided
 //! `T` and `E` are also [`IntoStatic`].
 //!
+//! The trait is also implemented for arrays [`[T; N]`](array) and tuples containing to 12 items,
+//! provided each type is [`IntoStatic`].
+//!
 //! When the `std` or `alloc` feature is enabled, [`IntoStatic`] is also
 //! implemented for `Cow<'_, T>`, yielding `Cow<'static, T>` (provided `T: 'static` is satisfied).
 
@@ -56,3 +59,37 @@ impl<T: IntoStatic, E: IntoStatic> IntoStatic for Result<T, E> {
             .map_err(IntoStatic::into_static)
     }
 }
+
+impl<T: IntoStatic, const N: usize> IntoStatic for [T; N] {
+    type Static = [T::Static; N];
+
+    fn into_static(self) -> Self::Static {
+        self.map(IntoStatic::into_static)
+    }
+}
+
+macro_rules! impl_tuple {
+    ($($name: ident: $type: ident),+) => {
+        impl<$($type: $crate::IntoStatic),+> $crate::IntoStatic for ($($type,)+) {
+            type Static = ($($type::Static,)+);
+
+            fn into_static(self) -> Self::Static {
+                let ($($name,)+) = self;
+                ($($name.into_static(),)+)
+            }
+        }
+    }
+}
+
+impl_tuple!(a: A);
+impl_tuple!(a: A, b: B);
+impl_tuple!(a: A, b: B, c: C);
+impl_tuple!(a: A, b: B, c: C, d: D);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F, g: G);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K);
+impl_tuple!(a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K, l: L);
