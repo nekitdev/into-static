@@ -23,7 +23,10 @@ use std::borrow::{Cow, ToOwned};
 extern crate alloc;
 
 #[cfg(all(not(feature = "std"), feature = "alloc"))]
-use alloc::borrow::{Cow, ToOwned};
+use alloc::{
+    borrow::{Cow, ToOwned},
+    vec::Vec,
+};
 
 /// Upgrading to `'static` lifetimes.
 pub trait IntoStatic {
@@ -65,6 +68,15 @@ impl<T: IntoStatic, const N: usize> IntoStatic for [T; N] {
 
     fn into_static(self) -> Self::Static {
         self.map(IntoStatic::into_static)
+    }
+}
+
+#[cfg(any(feature = "alloc", feature = "std"))]
+impl<T: IntoStatic> IntoStatic for Vec<T> {
+    type Static = Vec<T::Static>;
+
+    fn into_static(self) -> Self::Static {
+        self.into_iter().map(IntoStatic::into_static).collect()
     }
 }
 
