@@ -2,14 +2,15 @@
 //!
 //! This crate provides the [`IntoStatic`] trait, which allows upgrading all lifetimes to `'static`.
 //!
-//! [`IntoStatic`] is implemented for [`Option<T>`] and [`Result<T, E>`], provided
+//! [`IntoStatic`] is implemented for [`Option<T>`](Option) and [`Result<T, E>`](Result), provided
 //! `T` and `E` are also [`IntoStatic`].
 //!
 //! The trait is also implemented for arrays [`[T; N]`](array) and tuples containing to 12 items,
 //! provided each type is [`IntoStatic`].
 //!
 //! When the `std` or `alloc` feature is enabled, [`IntoStatic`] is also
-//! implemented for `Cow<'_, T>`, yielding `Cow<'static, T>` (provided `T: 'static` is satisfied).
+//! implemented for [`Cow<'_, T>`](Cow), yielding [`Cow<'static, T>`](Cow)
+//! (provided `T: 'static` is satisfied).
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
