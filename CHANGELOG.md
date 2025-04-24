@@ -2,6 +2,14 @@
 
 <!-- changelogging: start -->
 
+## [0.3.0](https://github.com/nekitdev/into-static/tree/v0.3.0) (2025-04-24)
+
+### Changes
+
+- Restricted `IntoStatic` to be idempotent.
+  The additional `IntoStatic<Static = Self::Static>` bound to `Static` of `IntoStatic` was added.
+  ([#2](https://github.com/nekitdev/into-static/pull/2))
+
 ## [0.2.1](https://github.com/nekitdev/into-static/tree/v0.2.1) (2025-04-20)
 
 ### Features
