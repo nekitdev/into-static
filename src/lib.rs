@@ -32,7 +32,7 @@ use alloc::{
 /// Upgrading to `'static` lifetimes.
 pub trait IntoStatic {
     /// The type with `'static` lifetimes.
-    type Static: 'static;
+    type Static: IntoStatic<Static = Self::Static> + 'static;
 
     /// Upgrades [`Self`] to [`Self::Static`].
     fn into_static(self) -> Self::Static;
