@@ -1,6 +1,6 @@
 [context]
 name = "into-static"
-version = "0.3.0"
+version = "0.4.0"
 url = "https://github.com/nekitdev/into-static"
 
 [formats]

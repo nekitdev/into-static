@@ -1,16 +1,6 @@
 //! Upgrading to static lifetimes.
 //!
 //! This crate provides the [`IntoStatic`] trait, which allows upgrading all lifetimes to `'static`.
-//!
-//! [`IntoStatic`] is implemented for [`Option<T>`](Option) and [`Result<T, E>`](Result), provided
-//! `T` and `E` are also [`IntoStatic`].
-//!
-//! The trait is also implemented for arrays [`[T; N]`](array) and tuples containing to 12 items,
-//! provided each type is [`IntoStatic`].
-//!
-//! When the `std` or `alloc` feature is enabled, [`IntoStatic`] is also
-//! implemented for [`Cow<'_, T>`](Cow), yielding [`Cow<'static, T>`](Cow)
-//! (provided `T: 'static` is satisfied).
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
@@ -18,16 +8,13 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 #[cfg(feature = "std")]
-use std::borrow::{Cow, ToOwned};
+use std::borrow::Cow;
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
 #[cfg(all(not(feature = "std"), feature = "alloc"))]
-use alloc::{
-    borrow::{Cow, ToOwned},
-    vec::Vec,
-};
+use alloc::{borrow::Cow, vec::Vec};
 
 /// Upgrading to `'static` lifetimes.
 pub trait IntoStatic {
@@ -39,11 +26,20 @@ pub trait IntoStatic {
 }
 
 #[cfg(any(feature = "std", feature = "alloc"))]
-impl<T: ToOwned + ?Sized + 'static> IntoStatic for Cow<'_, T> {
-    type Static = Cow<'static, T>;
+impl IntoStatic for Cow<'_, str> {
+    type Static = Cow<'static, str>;
 
     fn into_static(self) -> Self::Static {
         Self::Static::Owned(self.into_owned())
+    }
+}
+
+#[cfg(any(feature = "std", feature = "alloc"))]
+impl<T: Clone + IntoStatic<Static: Clone>> IntoStatic for Cow<'_, [T]> {
+    type Static = Cow<'static, [T::Static]>;
+
+    fn into_static(self) -> Self::Static {
+        Self::Static::Owned(self.into_owned().into_static())
     }
 }
 
@@ -88,6 +84,7 @@ macro_rules! impl_tuple {
 
             fn into_static(self) -> Self::Static {
                 let ($($name,)+) = self;
+
                 ($($name.into_static(),)+)
             }
         }
