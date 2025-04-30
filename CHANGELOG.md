@@ -2,6 +2,17 @@
 
 <!-- changelogging: start -->
 
+## [0.4.0](https://github.com/nekitdev/into-static/tree/v0.4.0) (2025-04-30)
+
+### Changes
+
+- The general implementation of `IntoStatic` for `Cow<'_, T>` was removed in favor of
+  more sensible implementations:
+
+  - `Cow<'_, str>` returning `Cow<'static, str>`;
+  - `Cow<'_, [T]>` returning `Cow<'static, [T::Static]>` provided `T: Clone + IntoStatic<Static:
+  Clone>`.
+
 ## [0.3.0](https://github.com/nekitdev/into-static/tree/v0.3.0) (2025-04-24)
 
 ### Changes
