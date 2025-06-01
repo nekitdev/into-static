@@ -38,6 +38,14 @@ cfg_if! {
             }
         }
 
+        impl IntoStatic for Cow<'_, [u8]> {
+            type Static = Cow<'static, [u8]>;
+
+            fn into_static(self) -> Self::Static {
+                Self::Static::Owned(self.into_owned())
+            }
+        }
+
         impl<T: Clone + IntoStatic<Static: Clone>> IntoStatic for Cow<'_, [T]> {
             type Static = Cow<'static, [T::Static]>;
 
