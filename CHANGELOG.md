@@ -2,6 +2,16 @@
 
 <!-- changelogging: start -->
 
+## [0.5.0](https://github.com/nekitdev/into-static/tree/v0.5.0) (2025-06-01)
+
+### Features
+
+- Implemented `IntoStatic` for `Cow<'_, [u8]>`.
+
+### Internal
+
+- `cfg-if` is now used in order to reduce boilerplate.
+
 ## [0.4.0](https://github.com/nekitdev/into-static/tree/v0.4.0) (2025-04-30)
 
 ### Changes
