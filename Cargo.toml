@@ -11,6 +11,9 @@ license = "MIT"
 keywords = ["static", "lifetime"]
 categories = ["rust-patterns"]
 
+[dependencies.cfg-if]
+version = "1.0.0"
+
 [features]
 default = ["std"]
 std = []

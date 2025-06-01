@@ -7,14 +7,17 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-#[cfg(feature = "std")]
-use std::borrow::Cow;
+use cfg_if::cfg_if;
 
-#[cfg(feature = "alloc")]
-extern crate alloc;
+cfg_if! {
+    if #[cfg(feature = "std")] {
+        use std::borrow::Cow;
+    } else if #[cfg(feature = "alloc")] {
+        extern crate alloc;
 
-#[cfg(all(not(feature = "std"), feature = "alloc"))]
-use alloc::{borrow::Cow, vec::Vec};
+        use alloc::{borrow::Cow, vec::Vec};
+    }
+}
 
 /// Upgrading to `'static` lifetimes.
 pub trait IntoStatic {
@@ -25,21 +28,31 @@ pub trait IntoStatic {
     fn into_static(self) -> Self::Static;
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
-impl IntoStatic for Cow<'_, str> {
-    type Static = Cow<'static, str>;
+cfg_if! {
+    if #[cfg(any(feature = "std", feature = "alloc"))] {
+        impl IntoStatic for Cow<'_, str> {
+            type Static = Cow<'static, str>;
 
-    fn into_static(self) -> Self::Static {
-        Self::Static::Owned(self.into_owned())
-    }
-}
+            fn into_static(self) -> Self::Static {
+                Self::Static::Owned(self.into_owned())
+            }
+        }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
-impl<T: Clone + IntoStatic<Static: Clone>> IntoStatic for Cow<'_, [T]> {
-    type Static = Cow<'static, [T::Static]>;
+        impl<T: Clone + IntoStatic<Static: Clone>> IntoStatic for Cow<'_, [T]> {
+            type Static = Cow<'static, [T::Static]>;
 
-    fn into_static(self) -> Self::Static {
-        Self::Static::Owned(self.into_owned().into_static())
+            fn into_static(self) -> Self::Static {
+                Self::Static::Owned(self.into_owned().into_static())
+            }
+        }
+
+        impl<T: IntoStatic> IntoStatic for Vec<T> {
+            type Static = Vec<T::Static>;
+
+            fn into_static(self) -> Self::Static {
+                self.into_iter().map(IntoStatic::into_static).collect()
+            }
+        }
     }
 }
 
@@ -65,15 +78,6 @@ impl<T: IntoStatic, const N: usize> IntoStatic for [T; N] {
 
     fn into_static(self) -> Self::Static {
         self.map(IntoStatic::into_static)
-    }
-}
-
-#[cfg(any(feature = "alloc", feature = "std"))]
-impl<T: IntoStatic> IntoStatic for Vec<T> {
-    type Static = Vec<T::Static>;
-
-    fn into_static(self) -> Self::Static {
-        self.into_iter().map(IntoStatic::into_static).collect()
     }
 }
 
