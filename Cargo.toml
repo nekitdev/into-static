@@ -12,7 +12,7 @@ keywords = ["static", "lifetime"]
 categories = ["rust-patterns"]
 
 [dependencies.cfg-if]
-version = "1.0.0"
+version = "1.0.1"
 
 [features]
 default = ["std"]
